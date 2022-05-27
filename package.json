@@ -6,8 +6,7 @@
   "scripts": {
     "test": "tsnd --respawn --transpile-only -r tsconfig-paths/register src/examples/staticPixBrCode.ts",
     "dev": "tsnd --respawn --transpile-only -r tsconfig-paths/register src/index.ts",
-    "build": "rm -rf ./dist && tsc -b",
-    "publish": "yarn build && git push && npm publish"
+    "build": "rm -rf ./dist && tsc -b"
   },
   "author": "Guihgo",
   "license": "ISC",
