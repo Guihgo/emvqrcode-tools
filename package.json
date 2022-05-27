@@ -1,12 +1,13 @@
 {
   "name": "pix-tools",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "",
   "main": "dist/index.js",
   "scripts": {
     "test": "tsnd --respawn --transpile-only -r tsconfig-paths/register src/examples/staticPixBrCode.ts",
     "dev": "tsnd --respawn --transpile-only -r tsconfig-paths/register src/index.ts",
-    "build": "rm -rf ./dist && tsc -b"
+    "build": "rm -rf ./dist && tsc -b",
+    "publish": "yarn build && npm publish"
   },
   "author": "Guihgo",
   "license": "ISC",
