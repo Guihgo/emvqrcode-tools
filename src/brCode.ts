@@ -7,17 +7,17 @@ export interface IStaticBRCodeParams {
     merchantName: string,
     merchantCity: string,
     postalCode?: string,
-    transactionAmount?: string,
+    transactionAmount?: string | number,
     referenceLabel?: string
 }
 
 export default class BrCode {
 
-    GUI = "BR.GOV.BCB.PIX"
-    PAYLOAD_FORMAT_INDICATOR = "01" //payload version QRCPS-MPM, fixed at “01”
-    COUNTRY_CODE = "BR" //Brazil - Country Code  ISO3166-1 alpha 2
-    MERCHANT_CATEGORY_CODE = "0000" //“0000” or MCC ISO18245
-    TRANSACTION_CURRENCY = "986" // Real Brasileiro ISO4217
+    private GUI = "BR.GOV.BCB.PIX"
+    private PAYLOAD_FORMAT_INDICATOR = "01" //payload version QRCPS-MPM, fixed at “01”
+    private COUNTRY_CODE = "BR" //Brazil - Country Code  ISO3166-1 alpha 2
+    private MERCHANT_CATEGORY_CODE = "0000" //“0000” or MCC ISO18245
+    private TRANSACTION_CURRENCY = "986" // Real Brasileiro ISO4217
 
     constructor(protected params: IStaticBRCodeParams) {
         this.normalize()
@@ -53,7 +53,12 @@ export default class BrCode {
 
         if (this.params.postalCode && this.params.postalCode.length > 99) this.params.postalCode = this.params.postalCode.slice(0, 99)
         
-        if (this.params.transactionAmount && this.params.transactionAmount.length > 13) this.params.transactionAmount = this.params.transactionAmount.slice(0, 13)
+        if (typeof this.params.transactionAmount === "string") {
+            if (this.params.transactionAmount && this.params.transactionAmount.length > 13) this.params.transactionAmount = this.params.transactionAmount.slice(0, 13)
+        }
+        if (typeof this.params.transactionAmount === "number") {
+            this.params.transactionAmount = this.params.transactionAmount.toFixed(2)
+        }
 
         if (this.params.referenceLabel) {
             if (this.params.referenceLabel.length > 25) this.params.referenceLabel = this.params.referenceLabel.slice(0, 25)
