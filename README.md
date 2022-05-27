@@ -1,5 +1,13 @@
 # Pix Tools
 
+Your PIX module for TypeScript!
+
+### Install
+
+```bash
+yarn add pix-tools
+```
+
 ### Static Pix BrCode
 
 ```ts
