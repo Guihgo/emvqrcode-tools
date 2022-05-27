@@ -1,10 +1,10 @@
 {
   "name": "pix-tools",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "test": "yarn dev",
+    "test": "tsnd --respawn --transpile-only -r tsconfig-paths/register src/examples/staticPixBrCode.ts",
     "dev": "tsnd --respawn --transpile-only -r tsconfig-paths/register src/index.ts",
     "build": "rm -rf ./dist && tsc -b"
   },

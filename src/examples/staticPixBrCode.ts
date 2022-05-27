@@ -5,7 +5,7 @@ const run = async ()=>{
         pixKey: "PIX_KEY_HERE",
         additionalInfo: "Some message",
         merchantName: "Guilherme Henrique",
-        merchantCity: "Sao Paulo",
+        merchantCity: "São Paulo",
         postalCode: "086300000",
         transactionAmount: "10.01",
         referenceLabel: "foo123bar"

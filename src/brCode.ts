@@ -20,10 +20,17 @@ export default class BrCode {
     TRANSACTION_CURRENCY = "986" // Real Brasileiro ISO4217
 
     constructor(protected params: IStaticBRCodeParams) {
-        this.validate()
+        this.normalize()
     }
 
-    validate() {
+    normalize() {
+
+        /* Remove all accents */
+        let param: keyof IStaticBRCodeParams
+        for (param in this.params) {
+            this.params[param] = (this.params[param] as keyof IStaticBRCodeParams).normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+        }
+
         /* https://www.bcb.gov.br/content/estabilidadefinanceira/forumpireunioes/Anexo%20I%20-%20Padr%C3%B5es%20para%20Inicia%C3%A7%C3%A3o%20do%20PIX.pdf pg 15 - 1.2.2 
             -> max: 99
             -> ID + GUID length + Key = 8
@@ -34,25 +41,24 @@ export default class BrCode {
 
         if (this.params.additionalInfo) {
             const maxAdditionalInfoLength = (99 - 8 - this.GUI.length - this.params.pixKey.length)
-            if (this.params.additionalInfo.length > maxAdditionalInfoLength) throw new Error(`Only ${maxAdditionalInfoLength} characters can be used using key ${this.params.pixKey} (length: ${this.params.pixKey.length})`)
+            if (this.params.additionalInfo.length > maxAdditionalInfoLength) this.params.additionalInfo = this.params.additionalInfo.slice(0, maxAdditionalInfoLength)
         } else {
             const maxPixKeyLength = (99 - 8 - this.GUI.length)
             if (this.params.pixKey.length > maxPixKeyLength) throw new Error(`Max length for 'Pix Key' is ${maxPixKeyLength}`)
         }
 
-        if (this.params.merchantName.length > 25) throw new Error("Max length for 'Merchant Name' is 25")
-
-        if (this.params.merchantCity.length > 15) throw new Error("Max length for 'Merchant City' is 15")
-
-        if (this.params.postalCode && this.params.postalCode.length > 99) throw new Error("Max length for 'Postal Code' is 99")
+        if (this.params.merchantName.length > 25) this.params.merchantName = this.params.merchantName.slice(0,25)
         
-        if (this.params.transactionAmount && this.params.transactionAmount.length > 13) throw new Error("Max length for 'Transaction Amount' is 13 ($ 1 000 000 000 ,00 )")
+        if (this.params.merchantCity.length > 15) this.params.merchantCity = this.params.merchantCity.slice(0, 15)
+
+        if (this.params.postalCode && this.params.postalCode.length > 99) this.params.postalCode = this.params.postalCode.slice(0, 99)
+        
+        if (this.params.transactionAmount && this.params.transactionAmount.length > 13) this.params.transactionAmount = this.params.transactionAmount.slice(0, 13)
 
         if (this.params.referenceLabel) {
-            if (this.params.referenceLabel.length > 25) throw new Error("Max length for 'Referrence  Code' is 25")
-            if (this.params.referenceLabel.indexOf(" ") >= 0) throw new Error("'Referrence  Code' include space ' '")
+            if (this.params.referenceLabel.length > 25) this.params.referenceLabel = this.params.referenceLabel.slice(0, 25)
+            if (this.params.referenceLabel.indexOf(" ") >= 0) this.params.referenceLabel = this.params.referenceLabel.replaceAll(" ", "")
         }
-
     }
 
     get() {
