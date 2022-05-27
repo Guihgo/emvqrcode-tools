@@ -7,7 +7,7 @@ const run = async ()=>{
         merchantName: "Guilherme Henrique",
         merchantCity: "São Paulo",
         postalCode: "086300000",
-        transactionAmount: "10.01",
+        transactionAmount: 10.01,
         referenceLabel: "foo123bar"
     })
     console.log(brCode.get())

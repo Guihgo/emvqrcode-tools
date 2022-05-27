@@ -24,13 +24,6 @@ export default class BrCode {
     }
 
     normalize() {
-
-        /* Remove all accents */
-        let param: keyof IStaticBRCodeParams
-        for (param in this.params) {
-            this.params[param] = (this.params[param] as keyof IStaticBRCodeParams).normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-        }
-
         /* https://www.bcb.gov.br/content/estabilidadefinanceira/forumpireunioes/Anexo%20I%20-%20Padr%C3%B5es%20para%20Inicia%C3%A7%C3%A3o%20do%20PIX.pdf pg 15 - 1.2.2 
             -> max: 99
             -> ID + GUID length + Key = 8
@@ -55,14 +48,19 @@ export default class BrCode {
         
         if (typeof this.params.transactionAmount === "string") {
             if (this.params.transactionAmount && this.params.transactionAmount.length > 13) this.params.transactionAmount = this.params.transactionAmount.slice(0, 13)
+            this.params.transactionAmount = Number(this.params.transactionAmount.replace(",", ".").trim())
         }
-        if (typeof this.params.transactionAmount === "number") {
-            this.params.transactionAmount = this.params.transactionAmount.toFixed(2)
-        }
+        this.params.transactionAmount = (this.params.transactionAmount as Number).toFixed(2)
 
         if (this.params.referenceLabel) {
             if (this.params.referenceLabel.length > 25) this.params.referenceLabel = this.params.referenceLabel.slice(0, 25)
             if (this.params.referenceLabel.indexOf(" ") >= 0) this.params.referenceLabel = this.params.referenceLabel.replaceAll(" ", "")
+        }
+
+        /* Remove all accents */
+        let param: keyof IStaticBRCodeParams
+        for (param in this.params) {
+            this.params[param] = (this.params[param] as keyof IStaticBRCodeParams).normalize("NFD").replace(/[\u0300-\u036f]/g, "")
         }
     }
 
