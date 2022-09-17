@@ -1,4 +1,4 @@
-import {  AdditionalDataFieldTemplate, EMVQR, MerchantAccountInformation, MerchantInformationLanguageTemplate, Constants, UnreservedTemplate, IEMVQR } from "./types"
+import {  AdditionalDataFieldTemplate, EMVQR, MerchantAccountInformation, MerchantInformationLanguageTemplate, Constants, UnreservedTemplate, IEMVQR, EthereumTransactionDataFieldTemplate } from "./types"
 
 const buildTags = (accumulator : any, currentCharacter: any) => {
     const currentTag = accumulator[accumulator.length - 1];
@@ -11,7 +11,7 @@ const buildTags = (accumulator : any, currentCharacter: any) => {
     else if (!currentTag.length) {
         currentTag.length = currentCharacter;
     }
-    else if (currentTag.length.length < 2) {
+    else if (currentTag.length.length < 2 || (isNaN(currentTag.id[0]) && currentTag.length.length < 3)) {
         currentTag.length += currentCharacter;
     }
     else if (!currentTag.value) {
@@ -65,11 +65,52 @@ const parseAdditionalDataFieldTemplate = (tags: Array<any>) => {
                     additionalDataFieldTemplate.addPaymentSystemSpecific(tag.id, t);
                 }
                 else if (tag.id >= Constants.ADDITIONAL_FIELD.AdditionalIDRFUforEMVCoRangeStart && tag.id <= Constants.ADDITIONAL_FIELD.AdditionalIDRFUforEMVCoRangeEnd) {
-                    additionalDataFieldTemplate.addRFUForEMVCo(tag.id, tag.value);
+                    additionalDataFieldTemplate.addRFUforEMVCo(tag.id, tag.value);
                 }
         }
         return additionalDataFieldTemplate;
     }, AdditionalDataFieldTemplate());
+    return result;
+};
+const parseEthereumTransactionFieldTemplate = (tags: Array<any>) => {
+    const result = tags.reduce((ethereumTransactionFieldTemplate, tag) => {
+        switch (tag.id) {
+            case Constants.ETHEREUM_TRANSACTION.NONCE:
+                ethereumTransactionFieldTemplate.setNonce(tag.value);
+                break;
+            case Constants.ETHEREUM_TRANSACTION.FROM:
+                ethereumTransactionFieldTemplate.setFrom(tag.value);
+                break;
+            case Constants.ETHEREUM_TRANSACTION.TO:
+                ethereumTransactionFieldTemplate.setTo(tag.value);
+                break;
+            case Constants.ETHEREUM_TRANSACTION.CHAIN_ID:
+                ethereumTransactionFieldTemplate.setChainId(tag.value);
+                break;
+            case Constants.ETHEREUM_TRANSACTION.VALUE:
+                ethereumTransactionFieldTemplate.setValue(tag.value);
+                break;
+            case Constants.ETHEREUM_TRANSACTION.GAS:
+                ethereumTransactionFieldTemplate.setGas(tag.value);
+                break;
+            case Constants.ETHEREUM_TRANSACTION.GAS_PRICE:
+                ethereumTransactionFieldTemplate.setGasPrice(tag.value);
+                break;
+            case Constants.ETHEREUM_TRANSACTION.DATA:
+                ethereumTransactionFieldTemplate.setData(tag.value);
+                break;
+            default:
+                // if (tag.id >= Constants.ADDITIONAL_FIELD.AdditionalIDPaymentSystemSpecificTemplatesRangeStart && tag.id <= Constants.ADDITIONAL_FIELD.AdditionalIDPaymentSystemSpecificTemplatesRangeEnd) {
+                //     const paymentSystemSpecificTags = tag.value.split('').reduce(buildTags, [{}]);
+                //     const t = parseMerchantAccountInformation(paymentSystemSpecificTags);
+                //     ethereumTransactionFieldTemplate.addPaymentSystemSpecific(tag.id, t);
+                // }
+                if (tag.id >= Constants.ETHEREUM_TRANSACTION.AdditionalIDRFUforEMVCoRangeStart && tag.id <= Constants.ETHEREUM_TRANSACTION.AdditionalIDRFUforEMVCoRangeEnd) {
+                    ethereumTransactionFieldTemplate.addRFUforEMVCo(tag.id, tag.value);
+                }
+        }
+        return ethereumTransactionFieldTemplate;
+    }, EthereumTransactionDataFieldTemplate());
     return result;
 };
 
@@ -172,6 +213,11 @@ export const toEMVQR = (qrcodeValue: string) => {
                 const adft = parseAdditionalDataFieldTemplate(additionalDataFieldTemplateTags);
                 emvqr.setAdditionalDataFieldTemplate(adft);
                 break;
+            case Constants.ID.IDEthereumTransaction:
+                const ethereumTransactionFieldTemplateTags = tag.value.split('').reduce(buildTags, [{}]);
+                const etft = parseEthereumTransactionFieldTemplate(ethereumTransactionFieldTemplateTags);
+                emvqr.setEthereumTransactionDataFieldTemplate(etft);
+                break;
             case Constants.ID.IDCRC:
                 emvqr.setCRC(tag.value);
                 break;
@@ -200,3 +246,38 @@ export const toEMVQR = (qrcodeValue: string) => {
     }, EMVQR());
     return result;
 };
+
+/* Parse a code to object */
+export const parse = (code: string) => {
+    const emvqr = toEMVQR(code)
+
+    const parseLines = (lines: string[], insideTemplate = false) => {
+        const object : any = {}
+
+        for(let i = 0; i < lines.length; i++) {
+            const line = lines[i]
+
+            const params = line.split(" ")
+
+            if (insideTemplate) {
+                if (params.length >= 4) {
+                    object[params[1]] = params.slice(3).join(" ")
+                    continue
+                } else break
+            } else {
+                if (params.length >= 3) {
+                    object[params[0]] = params.slice(2).join(" ")
+                    continue
+                }
+                if (params.length === 2) {
+                    object[params[0]] = parseLines(lines.slice(i + 1, lines.length), true)
+                    i += Object.keys(object[params[0]]).length
+                }
+            }
+        }
+
+        return object
+    }
+    return parseLines((emvqr.rawData() as string).split("\n"))
+}
+

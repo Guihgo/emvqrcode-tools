@@ -1,15 +1,16 @@
 {
-  "name": "pix-tools",
-  "version": "1.0.6",
+  "name": "emvqrcode-tools",
+  "version": "1.0.0",
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "test": "tsnd --respawn --transpile-only -r tsconfig-paths/register src/examples/staticPixBrCode.ts",
+    "test:PixBrCode": "tsnd --respawn --transpile-only -r tsconfig-paths/register src/examples/staticPixBrCode.ts",
+    "test:EthereumCode": "tsnd --respawn --transpile-only -r tsconfig-paths/register src/examples/staticEthereumCode.ts",
     "dev": "tsnd --respawn --transpile-only -r tsconfig-paths/register src/index.ts",
     "build": "rm -rf ./dist && tsc -b"
   },
   "author": "Guihgo",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "@types/node": "^17.0.35",
     "@types/typescript": "^2.0.0",
@@ -18,6 +19,7 @@
     "typescript": "^4.6.4"
   },
   "dependencies": {
-    "crc": "^4.1.1"
+    "crc": "^4.1.1",
+    "web3": "^1.7.5"
   }
 }

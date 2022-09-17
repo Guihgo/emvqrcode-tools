@@ -7,6 +7,7 @@ export const Merchant = {
      */
     buildTLV: _Merchant.TLV,
     buildAdditionalDataFieldTemplate: _Merchant.AdditionalDataFieldTemplate,
+    buildEthereumTransactionDataFieldTemplate: _Merchant.EthereumTransactionDataFieldTemplate,
     buildEMVQR: _Merchant.EMVQR,
     buildMerchantInformationLanguageTemplate: _Merchant.MerchantInformationLanguageTemplate,
     buildMerchantAccountInformation: _Merchant.MerchantAccountInformation,

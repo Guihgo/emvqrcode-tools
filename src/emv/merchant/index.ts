@@ -3,6 +3,7 @@ import * as Parser from "../parser"
 
 export default {
     AdditionalDataFieldTemplate: Types.AdditionalDataFieldTemplate,
+    EthereumTransactionDataFieldTemplate: Types.EthereumTransactionDataFieldTemplate,
     EMVQR: Types.EMVQR,
     MerchantAccountInformation: Types.MerchantAccountInformation,
     MerchantInformationLanguageTemplate: Types.MerchantInformationLanguageTemplate,

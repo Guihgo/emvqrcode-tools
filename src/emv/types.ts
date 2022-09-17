@@ -1,10 +1,10 @@
 /* eslint-disable no-return-assign */
 import {crc16ccitt} from "crc"
 
-const EMPTY_VALUE = '';
-const PAD_ZERO = '00';
+export const EMPTY_VALUE = '';
+export const PAD_ZERO = '00';
 
-const ID = {
+export const ID = {
     IDPayloadFormatIndicator: '00', // (M) Payload Format Indicator
     IDPointOfInitiationMethod: '01', // (O) Point of Initiation Method
     IDMerchantAccountInformationRangeStart: '02', // (M) 2-51 Merchant Account Information
@@ -26,9 +26,10 @@ const ID = {
     IDRFUForEMVCoRangeEnd: '79', // (O) 65-79 RFU for EMVCo
     IDUnreservedTemplatesRangeStart: '80', // (O) 80-99 Unreserved Templates
     IDUnreservedTemplatesRangeEnd: '99', // (O) 80-99 Unreserved Templates
+    IDEthereumTransaction: 'A0' /* Ethereum Transaction may be have more than 99 chars */
 };
 
-const ADDITIONAL_FIELD = {
+export const ADDITIONAL_FIELD = {
     AdditionalIDBillNumber: '01', // (O) Bill Number
     AdditionalIDMobileNumber: '02', // (O) Mobile Number
     AdditionalIDStoreLabel: '03', // (O) Store Label
@@ -44,13 +45,26 @@ const ADDITIONAL_FIELD = {
     AdditionalIDPaymentSystemSpecificTemplatesRangeEnd: '99', // (O) Payment System Specific Templates
 };
 
-const MERCHANT_ACCOUNT_INFORMATION = {
+export const ETHEREUM_TRANSACTION = {
+    NONCE: "01",
+    FROM: "02",
+    TO: "03",
+    CHAIN_ID: "04",
+    VALUE: "05",
+    GAS: "06",
+    GAS_PRICE: "07",
+    DATA: "A8", /* Data may be have more than 99 chars */
+    AdditionalIDRFUforEMVCoRangeStart: '09', // (O) RFU for EMVCo
+    AdditionalIDRFUforEMVCoRangeEnd: '48', // (O) RFU for EMVCo
+}
+
+export const MERCHANT_ACCOUNT_INFORMATION = {
     MerchantAccountInformationIDGloballyUniqueIdentifier: '00',
     MerchantAccountInformationIDPaymentNetworkSpecificStart: '01', // (O) 03-99 RFU for EMVCo
     MerchantAccountInformationIDPaymentNetworkSpecificEnd: '99', // (O) 03-99 RFU for EMVCo
 };
 
-const MERCHANT_INFORMATION = {
+export const MERCHANT_INFORMATION = {
     MerchantInformationIDLanguagePreference: '00', // (M) Language Preference
     MerchantInformationIDMerchantName: '01', // (M) Merchant Name
     MerchantInformationIDMerchantCity: '02', // (O) Merchant City
@@ -58,24 +72,25 @@ const MERCHANT_INFORMATION = {
     MerchantInformationIDRFUforEMVCoRangeEnd: '99', // (O) 03-99 RFU for EMVCo
 };
 
-const UNRESERVED_TEMPLATE = {
+export const UNRESERVED_TEMPLATE = {
     UnreservedTemplateIDGloballyUniqueIdentifier: '00',
     UnreservedTemplateIDContextSpecificDataStart: '01', // (O) 03-99 RFU for EMVCo
     UnreservedTemplateIDContextSpecificDataEnd: '99', // (O) 03-99 RFU for EMVCo
 };
 
-const INITIAL_METHOD = {
+export const INITIAL_METHOD = {
     PointOfInitiationMethodStatic: '11',
     PointOfInitiationMethodDynamic: '12',
 };
 
-const DATA_TYPE = {
+export const DATA_TYPE = {
     BINARY: 'binary',
     RAW: 'raw',
 };
 
 export const Constants = {
     ADDITIONAL_FIELD,
+    ETHEREUM_TRANSACTION,
     DATA_TYPE,
     ID,
     MERCHANT_ACCOUNT_INFORMATION,
@@ -466,6 +481,103 @@ export const AdditionalDataFieldTemplate = (
     };
 };
 
+export const EthereumTransactionDataFieldTemplate = (
+    nonce = TLV(ETHEREUM_TRANSACTION.NONCE, l(EMPTY_VALUE), EMPTY_VALUE),
+    from = TLV(ETHEREUM_TRANSACTION.TO, l(EMPTY_VALUE), EMPTY_VALUE),
+    to = TLV(ETHEREUM_TRANSACTION.TO, l(EMPTY_VALUE), EMPTY_VALUE),
+    chainId = TLV(ETHEREUM_TRANSACTION.CHAIN_ID, l(EMPTY_VALUE), EMPTY_VALUE),
+    value = TLV(ETHEREUM_TRANSACTION.VALUE, l(EMPTY_VALUE), EMPTY_VALUE),
+    gas = TLV(ETHEREUM_TRANSACTION.GAS, l(EMPTY_VALUE), EMPTY_VALUE),
+    gasPrice = TLV(ETHEREUM_TRANSACTION.GAS_PRICE, l(EMPTY_VALUE), EMPTY_VALUE),
+    data = TLV(ETHEREUM_TRANSACTION.DATA, l(EMPTY_VALUE), EMPTY_VALUE),
+    rfuForEMVCo: Array<any> = [], // `json:"RFU for EMVCo"`
+) => {
+    const dataWithType = (dataType: any, indent: any) => {
+        let t = '';
+        t += nonce.dataWithType(dataType, indent);
+        t += from.dataWithType(dataType, indent);
+        t += to.dataWithType(dataType, indent);
+        t += chainId.dataWithType(dataType, indent);
+        t += value.dataWithType(dataType, indent);
+        t += gas.dataWithType(dataType, indent);
+        t += gasPrice.dataWithType(dataType, indent);
+        t += data.dataWithType(dataType, indent);
+        t += rfuForEMVCo.reduce((accumulator, r) => accumulator += r.dataWithType(dataType, indent), '');
+        if (t && t !== '') {
+            return ID.IDEthereumTransaction + ' ' + ll(toString()) + '\n' + t;
+        }
+        return '';
+    };
+
+    const toString = () => {
+        let str = '';
+        str += nonce.toString();
+        str += from.toString();
+        str += to.toString();
+        str += chainId.toString();
+        str += value.toString();
+        str += gas.toString();
+        str += gasPrice.toString();
+        str += data.toString();
+        str += rfuForEMVCo.reduce((accumulator, r) => accumulator += r.toString(), '');
+        if (str && str !== '') {
+            return format(ID.IDEthereumTransaction, str);
+        }
+        return '';
+    };
+
+    const setNonce = (v: any) => {
+        nonce = TLV(ETHEREUM_TRANSACTION.NONCE, l(v), v);
+    };
+
+    const setFrom = (v: any) => {
+        from = TLV(ETHEREUM_TRANSACTION.FROM, l(v), v);
+    };
+
+    const setTo = (v: any) => {
+        to = TLV(ETHEREUM_TRANSACTION.TO, l(v), v);
+    };
+
+    const setChainId = (v: any) => {
+        chainId = TLV(ETHEREUM_TRANSACTION.CHAIN_ID, l(v), v);
+    };
+
+    const setValue = (v: any) => {
+        value = TLV(ETHEREUM_TRANSACTION.VALUE, l(v), v);
+    };
+
+    const setGas = (v: any) => {
+        gas = TLV(ETHEREUM_TRANSACTION.GAS, l(v), v);
+    };
+
+    const setGasPrice = (v: any) => {
+        gasPrice = TLV(ETHEREUM_TRANSACTION.GAS_PRICE, l(v), v);
+    };
+
+    const setData = (v: any) => {
+        data = TLV(ETHEREUM_TRANSACTION.DATA, l(v), v);
+    };
+
+
+    const addRFUforEMVCo = (id: any, v: any) => {
+        rfuForEMVCo.push(TLV(id, l(v), v));
+    };
+
+    return {
+        dataWithType,
+        toString,
+        setNonce,
+        setFrom,
+        setTo,
+        setChainId,
+        setValue,
+        setGas,
+        setGasPrice,
+        setData,
+        addRFUforEMVCo
+    };
+};
+
 export interface IEMVQR {
     dataWithType: (dataType: string)=>string,
     toBinary: ()=>string,
@@ -486,6 +598,7 @@ export interface IEMVQR {
     setPostalCode : (v: any) => void,
     setCRC : (v: any) => void,
     setAdditionalDataFieldTemplate : (v: any) => void,
+    setEthereumTransactionDataFieldTemplate : (v: any) => void,
     setMerchantInformationLanguageTemplate : (v: any) => void,
     addMerchantAccountInformation : (id: string, v: any) => void,
     addUnreservedTemplates : (id: string, v: any) => void,
@@ -507,6 +620,7 @@ export const EMVQR = (
     merchantCity = TLV(ID.IDMerchantCity, l(EMPTY_VALUE), EMPTY_VALUE), // `json:"Merchant City"`
     postalCode = TLV(ID.IDPostalCode, l(EMPTY_VALUE), EMPTY_VALUE), // `json:"Postal Code"`
     additionalDataFieldTemplate = AdditionalDataFieldTemplate(), // `json:"Additional Data Field Template"`
+    ethereumTransactionDataFieldTemplate = EthereumTransactionDataFieldTemplate(),
     crc = TLV(ID.IDCRC, l(EMPTY_VALUE), EMPTY_VALUE), // `json:"CRC"`
     merchantInformationLanguageTemplate = MerchantInformationLanguageTemplate(), // `json:"Merchant Information - Language Template"`
     rfuForEMVCo : Array<any> = [], // `json:"RFU for EMVCo"`
@@ -536,6 +650,7 @@ export const EMVQR = (
         Object.keys(unreservedTemplates).forEach(function (key) {
             str += unreservedTemplates[key].dataWithType(dataType, ' ');
         });
+        str += ethereumTransactionDataFieldTemplate.dataWithType(dataType, ' ');
         str += crc.dataWithType(dataType, indent);
         return str;
     };
@@ -571,6 +686,7 @@ export const EMVQR = (
         Object.keys(unreservedTemplates).forEach(function (key) {
             str += unreservedTemplates[key].toString();
         });
+        str += ethereumTransactionDataFieldTemplate.toString();
         str += formatCrc(str);
         return str;
     };
@@ -666,6 +782,10 @@ export const EMVQR = (
         additionalDataFieldTemplate = v;
     };
 
+    const setEthereumTransactionDataFieldTemplate = (v: any) => {
+        ethereumTransactionDataFieldTemplate = v;
+    };
+
     const setMerchantInformationLanguageTemplate = (v: any) => {
         merchantInformationLanguageTemplate = v;
     };
@@ -708,6 +828,7 @@ export const EMVQR = (
         setPostalCode,
         setCRC,
         setAdditionalDataFieldTemplate,
+        setEthereumTransactionDataFieldTemplate,
         setMerchantInformationLanguageTemplate,
         addMerchantAccountInformation,
         addUnreservedTemplates,
@@ -715,12 +836,12 @@ export const EMVQR = (
     };
 };
 
-const format = (id: string, value: string | any[]) => {
+export const format = (id: string, value: string | any[]) => {
     const valueLength = value.length;
-    return id + pad2(valueLength) + value;
+    return id + pad2(valueLength, (isNaN(id.charAt(0) as any)) ? 3 : 2) + value;
 };
 
-const formatCrc = (value: string) => {
+export const formatCrc = (value: string) => {
     if (value && value !== '') {
         const newValue = value + ID.IDCRC + '04';
         const crcValue = crc16ccitt(newValue).toString(16).toUpperCase().padStart(4, '0');
@@ -729,24 +850,24 @@ const formatCrc = (value: string) => {
     return '';
 };
 
-const l = (v: string | any[]) => {
+export const l = (v: string | any[]) => {
     if (v && v !== '') {
         return pad2(v.length);
     }
     return PAD_ZERO;
 };
 
-const ll = (v: string | any[]) => {
+export const ll = (v: string | any[]) => {
     if (v && v !== '') {
         return pad2(v.length - 4);
     }
     return PAD_ZERO;
 };
 
-const pad2 = (num: string | number, size?: number): string => {
-    if (num < 10) {
+export const pad2 = (num: string | number, size: number = 2): string => {
+    if (num < 100) {
         let s = num + '';
-        while (s.length < 2) s = '0' + s;
+        while (s.length < size) s = '0' + s;
         return s;
     }
     return num + '';
