@@ -1,7 +1,7 @@
 {
   "name": "emvqrcode-tools",
   "version": "1.0.0",
-  "description": "",
+  "description": "Typescript module to create and parse EMV QR Code. Pix & EthereumTransaction support. ",
   "main": "dist/index.js",
   "scripts": {
     "test:PixBrCode": "tsnd --respawn --transpile-only -r tsconfig-paths/register src/examples/staticPixBrCode.ts",
