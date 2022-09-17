@@ -1,6 +1,6 @@
 {
   "name": "emvqrcode-tools",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Typescript module to create and parse EMV QR Code. Pix & EthereumTransaction support. ",
   "main": "dist/index.js",
   "scripts": {
