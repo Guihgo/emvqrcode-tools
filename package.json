@@ -10,6 +10,7 @@
     "build": "rm -rf ./dist && tsc -b"
   },
   "author": "Guihgo",
+  "keywords": ["pix", "ethereum", "qrcode", "emv", "emvcode"],
   "license": "MIT",
   "devDependencies": {
     "@types/node": "^17.0.35",
