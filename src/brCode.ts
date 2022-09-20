@@ -1,4 +1,4 @@
-import { EMVParser } from "src"
+import { EMVParser } from "./index"
 import { Merchant } from "./emv"
 import { ADDITIONAL_FIELD, ID } from "./emv/types"
 import { removeEmpty } from "./utils"

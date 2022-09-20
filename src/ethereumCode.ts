@@ -1,7 +1,7 @@
 import { Merchant } from "./emv"
 import { TransactionConfig } from "web3-core"
 import { toChecksumAddress } from "web3-utils"
-import { EMVParser } from "src"
+import { EMVParser } from "./index"
 import { ETHEREUM_TRANSACTION, ID } from "./emv/types"
 import { removeEmpty } from "./utils"
 
