@@ -24,7 +24,7 @@ export enum EEthereumCodeConstants {
     ID_MERCHANT_ACCOUNT_INFORMATION = "26"
 }  
 
-export default class EthereumCode {
+export class EthereumCode {
 
     constructor(protected params: IEthereumCodeParams) {
         this.normalize()

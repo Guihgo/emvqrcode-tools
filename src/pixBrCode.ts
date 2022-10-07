@@ -25,7 +25,7 @@ export enum EBrCodeConstants {
     ID_MERCHANT_ACCOUNT_INFORMATION = "26"
 } 
 
-export default class BrCode {
+export class PixBrCode {
 
     constructor(protected params: IStaticBRCodeParams) {
         this.normalize()
