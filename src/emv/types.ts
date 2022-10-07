@@ -98,6 +98,18 @@ export const Constants = {
     UNRESERVED_TEMPLATE,
 }
 
+function toHex(str: string) : string {
+    if(Buffer!==undefined) {
+        return Buffer.from(str).toString('hex')
+    }
+    
+    const hex = unescape(encodeURIComponent(str))
+        .split('').map(function (v) {
+            return v.charCodeAt(0).toString(16)
+        }).join('')
+    return hex
+}
+
 export const TLV = (tag: string, length: string, value: string) : any => {
     if (typeof length === 'number') {
         length = pad2(length);
@@ -114,7 +126,7 @@ export const TLV = (tag: string, length: string, value: string) : any => {
         if (value && value !== '') {
             if (dataType === DATA_TYPE.BINARY) {
                 const REGEX_PATTERN = /(.{2})/g;
-                const hexStr = Buffer.from(value).toString('hex').toUpperCase();
+                const hexStr = toHex(value).toUpperCase();
                 let hexArray = hexStr.match(REGEX_PATTERN);
 
                 hexArray = hexArray || [];

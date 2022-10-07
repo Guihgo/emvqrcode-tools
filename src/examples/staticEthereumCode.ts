@@ -3,6 +3,7 @@ import Web3 from "web3"
 import { toChecksumAddress, toWei } from "web3-utils"
 
 const run = async () => {
+    console.log(Buffer.from("testeguihgo123").toString('hex').toUpperCase())
     const web3 = new Web3(new Web3.providers.HttpProvider("https://data-seed-prebsc-1-s3.binance.org:8545"))
     const defaultGas = "21000"
     const from = toChecksumAddress("0xAB518cD35e0Cc361Fe7687C3CF6b81147AA62d74")
