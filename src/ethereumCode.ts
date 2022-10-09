@@ -1,6 +1,7 @@
 import { Merchant } from "./emv"
 import { TransactionConfig } from "web3-core"
 import { toChecksumAddress } from "web3-utils"
+import ABIDecoder from "abi-decoder-typescript"
 import { EMVParser } from "./index"
 import { ETHEREUM_TRANSACTION, ID } from "./emv/types"
 import { removeEmpty } from "./utils"
@@ -68,10 +69,18 @@ export class EthereumCode {
         return emvqr.generatePayload()
     }
 
-    static parse(code: string): IEthereumCodeParams {
+    static parse(code: string, decodeABI: any = null): IEthereumCodeParams {
         const obj = EMVParser.parse(code)
         const ethTransaction = obj[ID.IDEthereumTransaction]
         const merchantAccountInformation = obj[EEthereumCodeConstants.ID_MERCHANT_ACCOUNT_INFORMATION]
+
+        let data = ethTransaction[ETHEREUM_TRANSACTION.DATA]
+        if (decodeABI!==null) {
+            const abiDecoder = new ABIDecoder()
+            abiDecoder.addABI(decodeABI)
+            data = abiDecoder.decodeMethod(data)
+        }
+
         return removeEmpty({
             transactionConfig: {
                 nonce: Number(ethTransaction[ETHEREUM_TRANSACTION.NONCE]),
@@ -81,7 +90,7 @@ export class EthereumCode {
                 value: ethTransaction[ETHEREUM_TRANSACTION.VALUE],
                 gas: ethTransaction[ETHEREUM_TRANSACTION.GAS],
                 gasPrice: ethTransaction[ETHEREUM_TRANSACTION.GAS_PRICE],
-                data: ethTransaction[ETHEREUM_TRANSACTION.DATA]
+                data
             },
             provider: {
                 host: merchantAccountInformation[EEthereumCodeConstants.ID_HOST]

@@ -1,6 +1,6 @@
 {
   "name": "emvqrcode-tools",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Typescript module to create and parse EMV QR Code. Pix & EthereumTransaction support. ",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -15,7 +15,13 @@
     "build": "rm -rf ./dist && tsc -b"
   },
   "author": "Guihgo",
-  "keywords": ["pix", "ethereum", "qrcode", "emv", "emvcode"],
+  "keywords": [
+    "pix",
+    "ethereum",
+    "qrcode",
+    "emv",
+    "emvcode"
+  ],
   "license": "MIT",
   "devDependencies": {
     "@types/node": "^17.0.35",
@@ -25,6 +31,7 @@
     "typescript": "^4.6.4"
   },
   "dependencies": {
+    "abi-decoder-typescript": "^3.0.0",
     "crc": "^4.1.1",
     "web3": "^1.7.5"
   }
