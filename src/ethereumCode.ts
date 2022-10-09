@@ -9,7 +9,6 @@ import { removeEmpty } from "./utils"
 export interface IEthereumCodeParams {
     transaction: TransactionConfig & {
         data?: TransactionConfig["data"] | any
-        interactWith?: string /* Smart Contract address */
     },
     provider?: {
         host: string,
@@ -66,7 +65,6 @@ export class EthereumCode {
         ethereumTransactionDataFieldTemplate.setGas(String(this.params.transaction.gas))
         ethereumTransactionDataFieldTemplate.setGasPrice(String(this.params.transaction.gasPrice))
         ethereumTransactionDataFieldTemplate.setData(this.params.transaction.data)
-        ethereumTransactionDataFieldTemplate.setInteractWith(this.params.transaction.interactWith)
 
         emvqr.setEthereumTransactionDataFieldTemplate(ethereumTransactionDataFieldTemplate);
 
@@ -95,7 +93,6 @@ export class EthereumCode {
                 gas: ethTransaction[ETHEREUM_TRANSACTION.GAS],
                 gasPrice: ethTransaction[ETHEREUM_TRANSACTION.GAS_PRICE],
                 data,
-                interactWith: ethTransaction[ETHEREUM_TRANSACTION.INTERACT_WTIH]
             },
             provider: {
                 host: merchantAccountInformation[EEthereumCodeConstants.ID_HOST]

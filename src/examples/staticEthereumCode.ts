@@ -21,7 +21,6 @@ const run = async () => {
             gas: defaultGas,
             gasPrice,
             data: "0xa9059cbb000000000000000000000000ab518cd35e0cc361fe7687c3cf6b81147aa62d7400000000000000000000000000000000000000000000000047bf879bb0c50000",
-            interactWith: "0xee5a767bdb73fafd4bb50317a8a78901a81547f4"
         },
         provider: {
             host: "https://data-seed-prebsc-1-s3.binance.org:8545"

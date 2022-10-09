@@ -54,9 +54,8 @@ export const ETHEREUM_TRANSACTION = {
     GAS: "06",
     GAS_PRICE: "07",
     DATA: "A8", /* Data may be have more than 99 chars */
-    INTERACT_WTIH: "09", /* Data may be have more than 99 chars */
-    AdditionalIDRFUforEMVCoRangeStart: '10', // (O) RFU for EMVCo
-    AdditionalIDRFUforEMVCoRangeEnd: '49', // (O) RFU for EMVCo
+    AdditionalIDRFUforEMVCoRangeStart: '09', // (O) RFU for EMVCo
+    AdditionalIDRFUforEMVCoRangeEnd: '48', // (O) RFU for EMVCo
 }
 
 export const MERCHANT_ACCOUNT_INFORMATION = {
@@ -503,7 +502,6 @@ export const EthereumTransactionDataFieldTemplate = (
     gas = TLV(ETHEREUM_TRANSACTION.GAS, l(EMPTY_VALUE), EMPTY_VALUE),
     gasPrice = TLV(ETHEREUM_TRANSACTION.GAS_PRICE, l(EMPTY_VALUE), EMPTY_VALUE),
     data = TLV(ETHEREUM_TRANSACTION.DATA, l(EMPTY_VALUE), EMPTY_VALUE),
-    interactWith = TLV(ETHEREUM_TRANSACTION.INTERACT_WTIH, l(EMPTY_VALUE), EMPTY_VALUE),
     rfuForEMVCo: Array<any> = [], // `json:"RFU for EMVCo"`
 ) => {
     const dataWithType = (dataType: any, indent: any) => {
@@ -516,7 +514,6 @@ export const EthereumTransactionDataFieldTemplate = (
         t += gas.dataWithType(dataType, indent);
         t += gasPrice.dataWithType(dataType, indent);
         t += data.dataWithType(dataType, indent);
-        t += interactWith.dataWithType(dataType, indent);
         t += rfuForEMVCo.reduce((accumulator, r) => accumulator += r.dataWithType(dataType, indent), '');
         if (t && t !== '') {
             return ID.IDEthereumTransaction + ' ' + ll(toString()) + '\n' + t;
@@ -534,7 +531,6 @@ export const EthereumTransactionDataFieldTemplate = (
         str += gas.toString();
         str += gasPrice.toString();
         str += data.toString();
-        str += interactWith.toString();
         str += rfuForEMVCo.reduce((accumulator, r) => accumulator += r.toString(), '');
         if (str && str !== '') {
             return format(ID.IDEthereumTransaction, str);
@@ -574,10 +570,6 @@ export const EthereumTransactionDataFieldTemplate = (
         data = TLV(ETHEREUM_TRANSACTION.DATA, l(v), v);
     };
 
-    const setInteractWith = (v: any) => {
-        interactWith = TLV(ETHEREUM_TRANSACTION.INTERACT_WTIH, l(v), v);
-    };
-
     const addRFUforEMVCo = (id: any, v: any) => {
         rfuForEMVCo.push(TLV(id, l(v), v));
     };
@@ -593,7 +585,6 @@ export const EthereumTransactionDataFieldTemplate = (
         setGas,
         setGasPrice,
         setData,
-        setInteractWith,
         addRFUforEMVCo
     };
 };
