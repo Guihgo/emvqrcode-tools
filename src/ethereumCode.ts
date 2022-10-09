@@ -8,6 +8,7 @@ import { removeEmpty } from "./utils"
 
 export interface IEthereumCodeParams {
     transaction: TransactionConfig & {
+        data?: TransactionConfig["data"] | any
         interactWith?: string /* Smart Contract address */
     },
     provider?: {
