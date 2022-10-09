@@ -99,6 +99,9 @@ const parseEthereumTransactionFieldTemplate = (tags: Array<any>) => {
             case Constants.ETHEREUM_TRANSACTION.DATA:
                 ethereumTransactionFieldTemplate.setData(tag.value);
                 break;
+            case Constants.ETHEREUM_TRANSACTION.INTERACT_WTIH:
+                ethereumTransactionFieldTemplate.setInteractWith(tag.value);
+                break;
             default:
                 // if (tag.id >= Constants.ADDITIONAL_FIELD.AdditionalIDPaymentSystemSpecificTemplatesRangeStart && tag.id <= Constants.ADDITIONAL_FIELD.AdditionalIDPaymentSystemSpecificTemplatesRangeEnd) {
                 //     const paymentSystemSpecificTags = tag.value.split('').reduce(buildTags, [{}]);

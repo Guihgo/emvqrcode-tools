@@ -7,7 +7,9 @@ import { ETHEREUM_TRANSACTION, ID } from "./emv/types"
 import { removeEmpty } from "./utils"
 
 export interface IEthereumCodeParams {
-    transactionConfig: TransactionConfig,
+    transaction: TransactionConfig & {
+        interactWith?: string /* Smart Contract address */
+    },
     provider?: {
         host: string,
     }
@@ -32,8 +34,8 @@ export class EthereumCode {
     }
 
     normalize() {
-        if (this.params.transactionConfig.from !== undefined) this.params.transactionConfig.from = toChecksumAddress(String(this.params.transactionConfig.from))
-        if (this.params.transactionConfig.to !== undefined) this.params.transactionConfig.to = toChecksumAddress(this.params.transactionConfig.to)
+        if (this.params.transaction.from !== undefined) this.params.transaction.from = toChecksumAddress(String(this.params.transaction.from))
+        if (this.params.transaction.to !== undefined) this.params.transaction.to = toChecksumAddress(this.params.transaction.to)
     }
 
     get() {
@@ -55,14 +57,15 @@ export class EthereumCode {
 
         const ethereumTransactionDataFieldTemplate = Merchant.buildEthereumTransactionDataFieldTemplate();
 
-        ethereumTransactionDataFieldTemplate.setNonce(String(this.params.transactionConfig.nonce))
-        ethereumTransactionDataFieldTemplate.setFrom(this.params.transactionConfig.from)
-        ethereumTransactionDataFieldTemplate.setTo(this.params.transactionConfig.to)
-        ethereumTransactionDataFieldTemplate.setChainId(String(this.params.transactionConfig.chainId))
-        ethereumTransactionDataFieldTemplate.setValue(String(this.params.transactionConfig.value))
-        ethereumTransactionDataFieldTemplate.setGas(String(this.params.transactionConfig.gas))
-        ethereumTransactionDataFieldTemplate.setGasPrice(String(this.params.transactionConfig.gasPrice))
-        ethereumTransactionDataFieldTemplate.setData(this.params.transactionConfig.data)
+        ethereumTransactionDataFieldTemplate.setNonce(String(this.params.transaction.nonce))
+        ethereumTransactionDataFieldTemplate.setFrom(this.params.transaction.from)
+        ethereumTransactionDataFieldTemplate.setTo(this.params.transaction.to)
+        ethereumTransactionDataFieldTemplate.setChainId(String(this.params.transaction.chainId))
+        ethereumTransactionDataFieldTemplate.setValue(String(this.params.transaction.value))
+        ethereumTransactionDataFieldTemplate.setGas(String(this.params.transaction.gas))
+        ethereumTransactionDataFieldTemplate.setGasPrice(String(this.params.transaction.gasPrice))
+        ethereumTransactionDataFieldTemplate.setData(this.params.transaction.data)
+        ethereumTransactionDataFieldTemplate.setInteractWith(this.params.transaction.interactWith)
 
         emvqr.setEthereumTransactionDataFieldTemplate(ethereumTransactionDataFieldTemplate);
 
@@ -81,8 +84,8 @@ export class EthereumCode {
             data = abiDecoder.decodeMethod(data)
         }
 
-        return removeEmpty({
-            transactionConfig: {
+        return removeEmpty<IEthereumCodeParams>({
+            transaction: {
                 nonce: Number(ethTransaction[ETHEREUM_TRANSACTION.NONCE]),
                 from: ethTransaction[ETHEREUM_TRANSACTION.FROM],
                 to: ethTransaction[ETHEREUM_TRANSACTION.TO],
@@ -90,7 +93,8 @@ export class EthereumCode {
                 value: ethTransaction[ETHEREUM_TRANSACTION.VALUE],
                 gas: ethTransaction[ETHEREUM_TRANSACTION.GAS],
                 gasPrice: ethTransaction[ETHEREUM_TRANSACTION.GAS_PRICE],
-                data
+                data,
+                interactWith: ethTransaction[ETHEREUM_TRANSACTION.INTERACT_WTIH]
             },
             provider: {
                 host: merchantAccountInformation[EEthereumCodeConstants.ID_HOST]
